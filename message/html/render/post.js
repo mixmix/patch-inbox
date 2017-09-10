@@ -15,7 +15,7 @@ exports.gives = nest('message.html.render')
 exports.create = function (api) {
   return nest('message.html.render', function renderMessage (msg, opts) {
     if (msg.value.content.type !== 'post') return
-    if (opts && opts.layout !== 'inbox') return
+    if (!opts || opts.layout !== 'inbox') return
 
     var element = api.message.html.layout(msg, Object.assign({}, {
       title: messageTitle(msg),
