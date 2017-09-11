@@ -90,8 +90,10 @@ Message -inbox-card {
 Scroller {
   div.wrapper {
     section.content {
-      div.Message.-inbox-card {
-        border-bottom: initial 
+      div.Message {
+        -inbox-card {
+          border-bottom: initial 
+        }
       }
     }
   }
