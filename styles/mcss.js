@@ -53,6 +53,11 @@ Message -inbox-card {
 
   section.content {
     max-width: 40rem
+
+    text-overflow: ellipsis
+    white-space: nowrap
+    overflow: hidden
+
     margin: 0
 
     header {
@@ -74,7 +79,7 @@ Message -inbox-card {
       flex-wrap: wrap
       margin-left: 2rem
 
-      span.replySymcol {
+      span.replySymbol {
         color: #666
         margin-right: .3rem
       }

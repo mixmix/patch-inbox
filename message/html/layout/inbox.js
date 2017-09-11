@@ -33,7 +33,7 @@ exports.create = (api) => {
     const myId = api.keys.sync.id()
     const recps = msgRollup.value.content.recps
       .map(recp => {
-        // TODO check these things are feed links!!! 
+        // TODO check these things are feed links!!!
         if (typeof recp === 'string') return recp
 
         if (recp.link) return recp.link
@@ -44,13 +44,13 @@ exports.create = (api) => {
 
     const showNewMsg = newMsg && newMsg.value.author !== myId
 
-    // const dataset = newMsg
-    //   ? { root: rootMsg.key, id: newMsg.key }
-    //   : { id: root.key }
+    const openMessage = ev => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      api.app.sync.goTo({ key: rootMsg.key })
+    }
 
-    const openMessage = () => api.app.sync.goTo({ key: rootMsg.key })
-
-    const card =  h('Message -inbox-card', { // This is required for patchbay keyboard shortcut 'o'
+    const card =  h('Message -inbox-card', { // class Message is required for patchbay keyboard shortcut 'o'
       attributes: {
         tabindex: '0'
       }
@@ -68,7 +68,7 @@ exports.create = (api) => {
           ? h('div.update', [
             h('span.replySymbol', '►'),
             messageContent(newMsg),
-            timestamp(newMsg || rootMsg), 
+            timestamp(newMsg || rootMsg),
           ]) : ''
       ]),
     ])
@@ -94,7 +94,7 @@ function getSpacerClass (recps) {
       return '-half'
     case 3:
       return '-half'
-    case 4: 
+    case 4:
       return '-half'
     case 5:
       return '-quarter'

@@ -6,7 +6,7 @@ const next = require('pull-next-step')
 const ref = require('ssb-ref')
 
 exports.gives = nest({
-  'post.page.inbox': true, 
+  'post.page.inbox': true,
   'app.html.menuItem': true
 })
 
@@ -27,14 +27,14 @@ exports.needs = nest({
 
 exports.create = function (api) {
   return nest({
-    'post.page.inbox': page, 
+    'post.page.inbox': page,
     'app.html.menuItem': menuItem
   })
 
   function menuItem () {
     return h('a', {
       style: { order: 2 },
-      'ev-click': () => api.app.sync.goTo({ page: 'inbox' })
+      'ev-click': () => api.app.sync.goTo({ page: 'inbox' }) // TODO goTo is patchbay
     }, '/inbox')
   }
 
@@ -42,6 +42,7 @@ exports.create = function (api) {
     const id = api.keys.sync.id()
 
     // TODO - create a postNew page
+    //
     // const composer = api.message.html.compose({
     //   meta: { type: 'post' },
     //   prepublish: meta => {
@@ -51,15 +52,21 @@ exports.create = function (api) {
     //   },
     //   placeholder: 'Write a private message. \n\n@mention users in the first message to start a private thread.'}
     // )
- 
+
     const newMsgCount = Value(0)
-    const { filterMenu, filterDownThrough, filterUpThrough, resetFeed } = api.app.html.filter(draw)
-    const { container, content } = api.app.html.scroller({ prepend: [
+    const { filterMenu, filterDownThrough, filterUpThrough, resetFeed } = api.app.html.filter(draw) // TODO dep on patchbay
+
+    // TODO - develop a better way to do styled pages with scroller
+    const { container, content } = api.app.html.scroller({ prepend: [ // TODO dep on patchbay
       h('div', { style: {'margin-left': '9rem', display: 'flex', 'align-items': 'baseline'} },  [
-        h('button', { 'ev-click': draw, stlye: {'margin-left': 0} }, 'REFRESH'),
-        h('span', ['New Messages: ', newMsgCount]), 
+        h('button.new', {
+          style: { 'margin-right': 'auto' },
+          'ev-click': () => api.app.sync.goTo({ page: 'private' }) // TODO replace with custom page
+        }, 'New'),
+        h('span', [newMsgCount, ' new messages']),
+        h('button.refresh', { 'ev-click': draw, stlye: {'margin-left': 0} }, 'REFRESH'),
       ]),
-      filterMenu 
+      filterMenu
     ] })
 
     function draw () {
@@ -91,5 +98,4 @@ exports.create = function (api) {
     return container
   }
 }
-
 
