@@ -10,13 +10,10 @@ exports.create = (api) => {
   return nest('router.sync.routes', (sofar = []) => {
     const pages = api.post.page
 
-    // loc = location
     const routes = [
-      [ loc => loc.page === 'inbox', pages.inbox ],
-      // [ loc => loc.page === 'private', pages.private ],
+      [ loc => loc.page === 'inbox', pages.inbox ]
     ]
 
     return [...routes, ...sofar]
   })
 }
-

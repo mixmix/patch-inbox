@@ -1,8 +1,15 @@
-const nest = require('depnest')
+Scroller {
+  div.wrapper {
+    section.content {
+      div.Message {
+        -inbox-card {
+          border-bottom: initial 
+        }
+      }
+    }
+  }
+}
 
-exports.gives = nest('styles.mcss')
-
-const inboxMcss = `
 Message -inbox-card {
   padding: .5rem
   display: flex
@@ -64,20 +71,31 @@ Message -inbox-card {
       display: flex
       align-items: baseline
 
+      font-size: 1rem
+      font-weight: 300
+      margin: 0
+
+      (img) { max-width: 100% }
+
       span {
         color: #666
         word-break: normal
         margin-right: .5rem
       }
-      $markdownSmall
     }
 
     div.update {
-      $markdownTiny
-
       display: flex
       flex-wrap: wrap
       margin-left: 2rem
+
+      color: #666
+      font-size: .9rem
+      font-weight: 300
+      margin: 0
+
+      (a) { color: #666 }
+      (img) { max-width: 100% }
 
       span.replySymbol {
         color: #666
@@ -91,53 +109,3 @@ Message -inbox-card {
     }
   }
 }
-
-Scroller {
-  div.wrapper {
-    section.content {
-      div.Message {
-        -inbox-card {
-          border-bottom: initial 
-        }
-      }
-    }
-  }
-}
-
-$markdownSmall {
-  div.Markdown {
-    h1, h2, h3, h4, h5, h6, p {
-      font-size: 1rem
-      font-weight: 300
-      margin: 0
-
-      (img) { max-width: 100% }
-    }
-  }
-}
-
-$markdownTiny {
-  div.Markdown {
-    h1, h2, h3, h4, h5, h6, p {
-      color: #666
-      font-size: .9rem
-      font-weight: 300
-      margin: 0
-
-      (a) { color: #666 }
-      (img) { max-width: 100% }
-    }
-  }
-}
-`
-
-exports.create = (api) => {
-  return nest('styles.mcss', mcss)
-
-  function mcss (sofar = {}) {
-    sofar['patchInbox.app.page.inbox'] = inboxMcss
-
-    return sofar
-  }
-}
-

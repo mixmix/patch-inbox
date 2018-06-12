@@ -1,4 +1,5 @@
-const { h, resolve, Value, Struct, Array: MutantArray } = require('mutant')
+const { h, resolve, computed, Value, Struct, Array: MutantArray } = require('mutant')
+const { isFeed } = require('ssb-ref')
 
 const Recipients = require('./composer-recipients')
 const TextArea = require('./composer-textarea')
@@ -6,28 +7,37 @@ const publish = require('./composer-publish')
 
 function Composer (opts, afterPublish) {
   const {
+    initialRecps = [],
+    myKey,
     initialText = '',
     suggest,
     extraFeedIds = [],
     beforePublish,
     i18n = identity,
     avatar = identity,
-    patchcorePublish
+    patchcorePublish,
+    onCancel = noop
   } = opts
 
   const state = Struct({
     text: Value(resolve(initialText)),
-    recps: MutantArray([]),
+    recps: MutantArray(buildRecps(initialRecps, myKey)),
     publishing: Value(false)
   })
 
   const textArea = TextArea({ state, i18n, suggest, extraFeedIds })
   textArea.publish = handlePublish // crude external API
 
+  const oneWayAlertClass = computed(state.recps, recps => recps.some(isMe) ? '-hidden' : '')
+
   return h('Composer', [
-    h('section.recipients', [
-      h('div.label', i18n('composer.field.recipients')),
+    h('section.recps', [
+      h('label.recps', i18n('composer.label.recipients')),
       Recipients({ state, suggest, avatar, i18n })
+    ]),
+    h('section.one-way', { className: oneWayAlertClass }, [
+      h('label.recps', ''),
+      h('div.alert', i18n('composer.alert.one-way'))
     ]),
     // TODO subject field
     // h('div.field -subject', [
@@ -37,7 +47,8 @@ function Composer (opts, afterPublish) {
     //     placeholder: i18n('optionalField')
     //   })
     // ]),
-    h('section.text', [
+    h('section.textArea', [
+      h('label.textArea', i18n('composer.label.textArea')),
       textArea
     ]),
     // TODO preview
@@ -45,55 +56,50 @@ function Composer (opts, afterPublish) {
     //   preview,
     // ]),
     h('section.actions', [
-      h('Button -primary',
-        { disabled: state.publishing, 'ev-click': handlePublish },
-        i18n('composer.action.publish')
-      )
+      h('label.actions', ''),
+      h('div.actions', [
+        h('button.-subtle',
+          { 'ev-click': handleCancel },
+          i18n('composer.action.cancel')
+        ),
+        h('button -primary',
+          { disabled: state.publishing, 'ev-click': handlePublish },
+          i18n('composer.action.publish')
+        )
+      ])
     ])
   ])
 
   function handlePublish () {
     publish({ state, beforePublish, afterPublish, patchcorePublish })
   }
+
+  function handleCancel () {
+    state.set(resolve(initialText))
+    state.recps.set(buildRecps(initialRecps, myKey))
+    state.publishing.set(false)
+    onCancel()
+  }
+
+  function isMe (recp) {
+    return recp === myKey || recp.link === myKey
+  }
+
+  function buildRecps (initialRecps, myKey) {
+    if (!isFeed(myKey)) throw new Error('Composer requires myKey to be a valid feedId')
+
+    const otherFeeds = resolve(initialRecps)
+      .filter(recp => isFeed(recp.link))
+      .filter(recp => !isMe(recp))
+
+    return [myKey, ...otherFeeds]
+  }
 }
 
 module.exports = Composer
 
-// TODO - move over into modules
-
-// exports.gives = nest('message.html.compose')
-
-// exports.needs = nest({
-//   'about.async.suggest': 'first',
-//   'channel.async.suggest': 'first',
-//   'emoji.async.suggest': 'first',
-//   'message.async.publish': 'first',
-//   // 'message.html.confirm': 'first'
-//   'translations.sync.strings': 'first'
-// })
-
-// exports.create = function (api) {
-//   return nest('message.html.compose', Composer)
-
-//   function Composer (options, afterPublish) {
-//     // TODO - extract methods
-//     const strings = api.translations.sync.strings()
-//     const suggest = {
-//       about: api.about.async.suggest || noop,
-//       channel: api.channel.async.suggest || noop,
-//       emojoi: api.emoji.async.suggest || noop
-//       // extraFeedIds
-//     }
-//     const patchcorePublish = api.message.async.publish
-//     // includes:
-//     //   - sbot.blobs.push (for public messages)
-//     //   - content = ssbKeys.box(content, content.recps.map(e => {
-//     //       return ref.isFeed(e) ? e : e.link
-//     //     }))
-
-//   }
-// }
-
 function identity (t) {
   return t
 }
+
+function noop () {}

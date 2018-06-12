@@ -1,4 +1,4 @@
-const { h, map } = require('mutant')
+const { h, computed, map } = require('mutant')
 const addSuggest = require('suggest-box')
 
 function Recipients (opts) {
@@ -17,10 +17,14 @@ function Recipients (opts) {
 
 module.exports = Recipients
 
-function Recipient ({ recp, avatar }) {
-  // if (recp === myId) return
+const MIN_RECPS = 0
 
-  return h('Recipient', [
+function Recipient ({ recp, avatar }) {
+  if (typeof recp === 'string') { // assume it's myId
+    return h('div.recp', [ avatar(recp, 'tiny') ])
+  }
+
+  return h('div.recp', [
     avatar(recp.link, 'tiny'),
     h('div.name', recp.name)
   ])
@@ -29,7 +33,7 @@ function Recipient ({ recp, avatar }) {
 function RecipientInput ({ state, suggest, i18n }) {
   const { recps } = state
 
-  const input = h('input.RecipientInput', {
+  const input = h('input', {
     placeholder: i18n('composer.action.addMoreRecps')
   })
 
@@ -46,7 +50,7 @@ function RecipientInput ({ state, suggest, i18n }) {
     }
 
     if (e.code === 'Backspace' || e.key === 'Backspace' || e.keyCode === 8) {
-      if (recps.getLength() < 3) return // can only delete down to 2 recps (sender + 1 recp)
+      if (recps.getLength() < MIN_RECPS) return // can only delete down to 2 recps (sender + 1 recp)
 
       recps.pop()
     }

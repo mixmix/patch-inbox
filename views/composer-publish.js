@@ -27,8 +27,10 @@ function publish (opts) {
       if (err) handleErr(err)
       else if (msg) {
         text.set('')
+        recps.set([])
         // textArea.value = '' // un-needed?
       }
+
       if (afterPublish) afterPublish(err, msg)
     })
   })

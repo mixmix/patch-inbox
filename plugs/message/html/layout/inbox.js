@@ -1,5 +1,5 @@
 const nest = require('depnest')
-const { h, Value } = require('mutant')
+const { h } = require('mutant')
 
 exports.gives = nest('message.html.layout')
 
@@ -8,11 +8,10 @@ exports.needs = nest({
   'keys.sync.id': 'first',
   'message.html.backlinks': 'first',
   'message.html.author': 'first',
-  'message.html.markdown': 'first',
   'message.html.meta': 'map',
   'message.html.timestamp': 'first',
   'post.html.subject': 'first',
-  'app.sync.goTo': 'first', // TODO generalise - this is patchbay only
+  'app.sync.goTo': 'first' // TODO generalise - this is patchbay only
 })
 
 exports.create = (api) => {
@@ -21,12 +20,9 @@ exports.create = (api) => {
   function inboxLayout (msgRollup, { layout, content } = {}) {
     if (layout !== 'inbox') return
 
-    var rawMessage = Value(null)
+    const { timestamp } = api.message.html
 
-    const { timestamp, author, meta } = api.message.html
-    const { image } = api.about.html
-
-    const msgCount = msgRollup.replies.length + 1
+    const msgCount = msgRollup.replies.filter(r => r.value.content.type === 'post').length + 1
     const rootMsg = msgRollup
     const newMsg = getNewestMsg(msgRollup)
 
@@ -40,7 +36,7 @@ exports.create = (api) => {
       })
       .filter(key => key !== myId)
       .filter(Boolean)
-      .reduce((sofar, el) => sofar.includes(el) ? sofar : [...sofar, el], []) //.uniq
+      .reduce((sofar, el) => sofar.includes(el) ? sofar : [...sofar, el], []) // .uniq
 
     const showNewMsg = newMsg && newMsg.value.author !== myId
 
@@ -50,14 +46,14 @@ exports.create = (api) => {
       api.app.sync.goTo({ key: rootMsg.key })
     }
 
-    const card =  h('Message -inbox-card', { // class Message is required for patchbay keyboard shortcut 'o'
+    const card = h('Message -inbox-card', { // class Message is required for patchbay keyboard shortcut 'o'
       attributes: {
         tabindex: '0'
       }
     }, [
       h('section.recps', {}, [
         h('div.spacer', { className: getSpacerClass(recps) }),
-        h('div.recps', { className: getRecpsClass(recps) }, recps.map(image)),
+        h('div.recps', { className: getRecpsClass(recps) }, recps.map(api.about.html.image))
       ]),
       h('section.content', { 'ev-click': openMessage }, [
         h('header', [
@@ -68,9 +64,9 @@ exports.create = (api) => {
           ? h('div.update', [
             h('span.replySymbol', '►'),
             messageContent(newMsg),
-            timestamp(newMsg || rootMsg),
+            timestamp(newMsg || rootMsg)
           ]) : ''
-      ]),
+      ])
     ])
 
     return card
@@ -106,7 +102,7 @@ function getSpacerClass (recps) {
 }
 
 function getRecpsClass (recps) {
- switch (recps.length) {
+  switch (recps.length) {
     case 1:
       return '-inbox-large'
     case 2:
@@ -115,5 +111,3 @@ function getRecpsClass (recps) {
       return '-inbox-small'
   }
 }
-
-

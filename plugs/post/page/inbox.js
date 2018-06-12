@@ -3,7 +3,6 @@ const { h, Value } = require('mutant')
 const pull = require('pull-stream')
 const Scroller = require('pull-scroll')
 const next = require('pull-next-step')
-const ref = require('ssb-ref')
 
 exports.gives = nest({
   'post.page.inbox': true,
@@ -11,18 +10,16 @@ exports.gives = nest({
 })
 
 exports.needs = nest({
-  'app.html': {
-    filter: 'first',
-    scroller: 'first'
-  },
-  'app.sync.goTo': 'first',
+  'app.html.filter': 'first',
+  'app.html.modal': 'first',
+  'app.html.scroller': 'first',
+  'app.sync.goTo': 'first', // TODO replace
   'feed.pull.private': 'first',
   'feed.pull.rollup': 'first',
   'keys.sync.id': 'first',
-  'message.html': {
-    // compose: 'first',
-    render: 'first'
-  }
+  'message.html.compose': 'first',
+  'post.html.new': 'first',
+  'message.html.render': 'first'
 })
 
 exports.create = function (api) {
@@ -39,32 +36,29 @@ exports.create = function (api) {
   }
 
   function page (location) {
-    const id = api.keys.sync.id()
+    // const id = api.keys.sync.id()
 
-    // TODO - create a postNew page
-    //
-    // const composer = api.message.html.compose({
-    //   meta: { type: 'post' },
-    //   prepublish: meta => {
-    //     meta.recps = [id, ...(meta.mentions || [])]
-    //       .filter(m => ref.isFeed(typeof m === 'string' ? m : m.link))
-    //     return meta
-    //   },
-    //   placeholder: 'Write a private message. \n\n@mention users in the first message to start a private thread.'}
-    // )
+    const composerOpen = Value(false)
+    const composer = api.post.html.new(composerOpen, (err, msg) => {
+      if (err) return console.log(err)
+      composerOpen.set(false)
+    })
+    const modal = api.app.html.modal(composer, { isOpen: composerOpen })
 
     const newMsgCount = Value(0)
     const { filterMenu, filterDownThrough, filterUpThrough, resetFeed } = api.app.html.filter(draw) // TODO dep on patchbay
+    const createNewMessage = () => composerOpen.set(true)
 
     // TODO - develop a better way to do styled pages with scroller
     const { container, content } = api.app.html.scroller({ prepend: [ // TODO dep on patchbay
-      h('div', { style: {'margin-left': '9rem', display: 'flex', 'align-items': 'baseline'} },  [
-        h('button.new', {
+      modal,
+      h('div', { style: {'margin-left': '9rem', display: 'flex', 'align-items': 'baseline'} }, [
+        h('button.new.-primary', {
           style: { 'margin-right': 'auto' },
-          'ev-click': () => api.app.sync.goTo({ page: 'private' }) // TODO replace with custom page
+          'ev-click': createNewMessage
         }, 'New'),
-        h('span', [newMsgCount, ' new messages']),
-        h('button.refresh', { 'ev-click': draw, stlye: {'margin-left': 0} }, 'REFRESH'),
+        h('span', { style: { 'margin-right': '1rem' } }, [newMsgCount, ' new messages']),
+        h('button.refresh', { 'ev-click': draw, stlye: {'margin-left': 0} }, 'REFRESH')
       ]),
       filterMenu
     ] })
@@ -73,15 +67,16 @@ exports.create = function (api) {
       newMsgCount.set(0)
       resetFeed({ container, content })
 
+      // TODO - replace this with ssb-query ordered by published timestamp
       pull(
-        next(api.feed.pull.private, {old: false, limit: 100, property: ['value', 'timestamp']}),
+        next(api.feed.pull.private, {old: false, limit: 100, property: ['value']}),
         filterDownThrough(),
         pull.drain(msg => newMsgCount.set(newMsgCount() + 1))
         // TODO - better NEW MESSAGES
       )
 
       pull(
-        next(api.feed.pull.private, {reverse: true, limit: 100, live: false}, ['value', 'timestamp']),
+        next(api.feed.pull.private, {reverse: true, limit: 100, live: false}, ['value']),
         filterUpThrough(),
         pull.filter(msg => msg.value.content.recps),
         api.feed.pull.rollup(),
@@ -98,4 +93,3 @@ exports.create = function (api) {
     return container
   }
 }
-

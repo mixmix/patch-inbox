@@ -2,12 +2,8 @@ var nest = require('depnest')
 var h = require('mutant/h')
 
 exports.needs = nest({
-  'message.html': {
-    decorate: 'reduce',
-    layout: 'first',
-    link: 'first',
-    markdown: 'first'
-  }
+  'message.html.layout': 'first',
+  'message.html.link': 'first'
 })
 
 exports.gives = nest('message.html.render')
@@ -18,14 +14,14 @@ exports.create = function (api) {
     if (!opts || opts.layout !== 'inbox') return
 
     var element = api.message.html.layout(msg, Object.assign({}, {
-      title: messageTitle(msg),
+      title: messageTitle(msg)
       // content: messageContent(msg), // not needed
     }, opts))
 
     // decorate locally
     if (msg.replies && msg.replies.length) {
       element.dataset.root = msg.key
-      element.dataset.id = msg.replies[msg.replies.length-1].key
+      element.dataset.id = msg.replies[msg.replies.length - 1].key
     } else {
       element.dataset.id = msg.key
     }
@@ -38,4 +34,3 @@ exports.create = function (api) {
     return !root ? null : h('span', ['re: ', api.message.html.link(root)])
   }
 }
-
