@@ -57,7 +57,7 @@ exports.create = function (api) {
         }, 'New'),
         h('div.refresh', [
           newMsgCount, ' new messages',
-          h('button', { className: when(newMsgCount, '-primary') }, 'Refresh')
+          h('button', { 'ev-click': draw, className: when(newMsgCount, '-primary') }, 'Refresh')
         ])
       ]),
       filterMenu

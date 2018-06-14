@@ -54,6 +54,7 @@ exports.create = (api) => {
         h('div.recps', recps.map(api.about.html.image))
         // h('div.spacer', { className: getSpacerClass(recps) })
       ]),
+      h('div.spacer'),
       h('section.content', { 'ev-click': openMessage }, [
         h('header', [
           h('span.count', `(${msgCount})`),

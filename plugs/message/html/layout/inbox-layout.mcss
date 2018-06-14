@@ -1,8 +1,10 @@
 Message -inbox-card {
   padding: .5rem 0
 
+  cursor: pointer
+
   display: grid
-  grid-template-columns: 9rem auto
+  grid-template-columns: 8.5rem minmax(0, .8rem) auto
   justify-content: flex-start
 
   section.recps {
@@ -29,6 +31,10 @@ Message -inbox-card {
     /*     width: 4rem  */
     /*   } */
     /* } */
+  }
+
+  div.spacer {
+    margin-right: .5rem
   }
 
   section.content {
@@ -86,5 +92,9 @@ Message -inbox-card {
   :focus {
     outline: none
     color: var(--card-font-color)
+
+    div.spacer {
+      background-color: var(--card-font-color)
+    }
   }
 }
