@@ -48,7 +48,6 @@ function i18n (key) {
     'composer.action.cancel': 'Cancel',
     'composer.alert.one-way': 'Note: you are not currently a recipient, so you will not be able to read this later. This can be useful for sending secrets you cannot hold on to.'
   }
-  console.log(t, key, t[key])
   return t[key] || ''
 }
 

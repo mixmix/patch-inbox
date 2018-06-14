@@ -1,0 +1,90 @@
+Message -inbox-card {
+  padding: .5rem 0
+
+  display: grid
+  grid-template-columns: 9rem auto
+  justify-content: flex-start
+
+  section.recps {
+    display: flex
+    justify-content: flex-start
+
+    div.recps {
+      display: flex
+      flex-wrap: wrap
+
+      img.Avatar {
+        width: 2.4rem
+        height: 2.4rem
+        margin: .15rem .3rem .15rem 0
+      }
+    }
+
+    /* div.spacer { */
+    /*   -quarter { */
+    /*     width: 2rem  */
+    /*   } */
+
+    /*   -half { */
+    /*     width: 4rem  */
+    /*   } */
+    /* } */
+  }
+
+  section.content {
+    text-overflow: ellipsis
+    white-space: nowrap
+    overflow: hidden
+
+    margin: 0
+
+    display: grid
+    align-items: center
+
+    header {
+      display: flex
+      align-items: baseline
+
+      font-size: 1rem
+      font-weight: 300
+      margin: 0
+
+      (img) { max-width: 100% }
+
+      span {
+        color: #666
+        word-break: normal
+        margin-right: .5rem
+      }
+    }
+
+    div.update {
+      align-self: start
+      color: #666
+      font-size: .9rem
+      font-weight: 300
+
+      display: flex
+      flex-wrap: wrap
+      align-items: baseline
+
+      (a) { color: #666 }
+      (img) { max-width: 100% }
+
+      span.replySymbol {
+        color: #666
+        margin-right: .3rem
+      }
+
+      a.Timestamp {
+        margin-left: 1rem
+        font-size: .8rem
+      }
+    }
+  }
+
+  :focus {
+    outline: none
+    color: var(--card-font-color)
+  }
+}

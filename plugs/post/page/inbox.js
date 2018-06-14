@@ -1,5 +1,5 @@
 const nest = require('depnest')
-const { h, Value } = require('mutant')
+const { h, Value, when } = require('mutant')
 const pull = require('pull-stream')
 const Scroller = require('pull-scroll')
 const next = require('pull-next-step')
@@ -49,19 +49,20 @@ exports.create = function (api) {
     const { filterMenu, filterDownThrough, filterUpThrough, resetFeed } = api.app.html.filter(draw) // TODO dep on patchbay
     const createNewMessage = () => composerOpen.set(true)
 
-    // TODO - develop a better way to do styled pages with scroller
-    const { container, content } = api.app.html.scroller({ prepend: [ // TODO dep on patchbay
+    const prepend = [ // TODO dep on patchbay
       modal,
-      h('div', { style: {'margin-left': '9rem', display: 'flex', 'align-items': 'baseline'} }, [
+      h('div.actions', [
         h('button.new.-primary', {
-          style: { 'margin-right': 'auto' },
           'ev-click': createNewMessage
         }, 'New'),
-        h('span', { style: { 'margin-right': '1rem' } }, [newMsgCount, ' new messages']),
-        h('button.refresh', { 'ev-click': draw, stlye: {'margin-left': 0} }, 'REFRESH')
+        h('div.refresh', [
+          newMsgCount, ' new messages',
+          h('button', { className: when(newMsgCount, '-primary') }, 'Refresh')
+        ])
       ]),
       filterMenu
-    ] })
+    ]
+    const { container, content } = api.app.html.scroller({ prepend, className: 'Inbox' })
 
     function draw () {
       newMsgCount.set(0)

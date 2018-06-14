@@ -1,0 +1,30 @@
+Inbox {
+  section.top {
+    margin-bottom
+
+    div.actions {
+      display: flex
+      justify-content: space-between
+
+      div.refresh {
+        display: flex
+        align-items: center
+
+        button { margin-left: 1rem }
+      }
+    }
+
+    div.Filter {
+      min-width: initial
+      max-width: initial
+    }
+  }
+
+  section.content {
+    margin-top: 1rem
+    div.Message {
+      -inbox-card {
+      }
+    }
+  }
+}

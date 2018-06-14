@@ -46,14 +46,13 @@ exports.create = (api) => {
       api.app.sync.goTo({ key: rootMsg.key })
     }
 
-    const card = h('Message -inbox-card', { // class Message is required for patchbay keyboard shortcut 'o'
-      attributes: {
-        tabindex: '0'
-      }
+    return h('Message -inbox-card', { // class Message is required for patchbay keyboard shortcut 'o'
+      attributes: { tabindex: '0' },
+      style: { '--card-font-color': `hsl(${Math.floor(Math.random() * 360)}, 59%, 37%)` }
     }, [
       h('section.recps', {}, [
-        h('div.spacer', { className: getSpacerClass(recps) }),
-        h('div.recps', { className: getRecpsClass(recps) }, recps.map(api.about.html.image))
+        h('div.recps', recps.map(api.about.html.image))
+        // h('div.spacer', { className: getSpacerClass(recps) })
       ]),
       h('section.content', { 'ev-click': openMessage }, [
         h('header', [
@@ -68,8 +67,6 @@ exports.create = (api) => {
           ]) : ''
       ])
     ])
-
-    return card
   }
 
   function messageContent (msg) {
@@ -101,13 +98,3 @@ function getSpacerClass (recps) {
   }
 }
 
-function getRecpsClass (recps) {
-  switch (recps.length) {
-    case 1:
-      return '-inbox-large'
-    case 2:
-      return '-inbox-large'
-    default:
-      return '-inbox-small'
-  }
-}
