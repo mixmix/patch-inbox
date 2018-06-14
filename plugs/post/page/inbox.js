@@ -43,7 +43,7 @@ exports.create = function (api) {
       if (err) return console.log(err)
       composerOpen.set(false)
     })
-    const modal = api.app.html.modal(composer, { isOpen: composerOpen })
+    const modal = api.app.html.modal(composer, { isOpen: composerOpen, className: '-dark' })
 
     const newMsgCount = Value(0)
     const { filterMenu, filterDownThrough, filterUpThrough, resetFeed } = api.app.html.filter(draw) // TODO dep on patchbay

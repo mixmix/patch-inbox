@@ -25,6 +25,8 @@ Composer {
     transition: all .2s ease-in
 
     div.alert {
+      background: #000
+      color: #ff9f47
       text-align: left
       padding: 0 .5rem
     }
