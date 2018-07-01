@@ -27,7 +27,7 @@ exports.create = (api) => {
     const newMsg = getNewestMsg(msgRollup)
 
     const myId = api.keys.sync.id()
-    const recps = msgRollup.value.content.recps
+    const recps = (msgRollup.value.content.recps || [])
       .map(recp => {
         // TODO check these things are feed links!!!
         if (typeof recp === 'string') return recp
