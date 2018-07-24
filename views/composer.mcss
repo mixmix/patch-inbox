@@ -5,6 +5,8 @@ Composer {
   /* min-height: 45rem */
   max-height: 90vh
 
+  margin: 1.6rem 1.7rem 2rem 1.5rem
+
   section {
     display: grid
     grid-template-columns: 0rem auto

@@ -18,7 +18,7 @@ exports.create = function (api) {
   function mcss (sofar = {}) {
     each(contents, (content, [filename]) => {
       const name = basename(filename)
-      sofar[name] = content
+      sofar[`patch-inbox-${name}`] = content
     })
     return sofar
   }

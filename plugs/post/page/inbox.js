@@ -68,23 +68,24 @@ exports.create = function (api) {
       newMsgCount.set(0)
       resetFeed({ container, content })
 
-      // TODO - replace this with ssb-query ordered by published timestamp
       pull(
-        next(api.feed.pull.private, {old: false, limit: 100, property: ['value']}),
+        next(api.feed.pull.private, {reverse: true, live: false, limit: 100, property: ['timestamp']}),
         filterDownThrough(),
-        pull.drain(msg => newMsgCount.set(newMsgCount() + 1))
-        // TODO - better NEW MESSAGES
-      )
-
-      pull(
-        next(api.feed.pull.private, {reverse: true, limit: 100, live: false}, ['value']),
-        filterUpThrough(),
         pull.filter(msg => msg.value.content.recps),
         api.feed.pull.rollup(),
         Scroller(container, content, render, false, false)
       )
     }
     draw()
+
+    // TODO - replace this with ssb-query ordered by published timestamp
+    pull(
+      next(api.feed.pull.private, {reverse: false, live: true, old: false, limit: 100, property: ['timestamp']}),
+      pull.filter(m => !m.sync),
+      filterUpThrough(),
+      pull.drain(msg => newMsgCount.set(newMsgCount() + 1))
+      // TODO - better NEW MESSAGES
+    )
 
     function render (msgRollup) {
       return api.message.html.render(msgRollup, { layout: 'inbox' })
