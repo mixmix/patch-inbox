@@ -1,6 +1,6 @@
 {
   "name": "patch-inbox",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "an inbox for the patchcore ecosystem",
   "main": "index.js",
   "scripts": {
