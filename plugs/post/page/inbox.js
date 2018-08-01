@@ -2,7 +2,7 @@ const nest = require('depnest')
 const { h, Value, when } = require('mutant')
 const pull = require('pull-stream')
 const Scroller = require('pull-scroll')
-const next = require('pull-next-step')
+const next = require('pull-next-query')
 
 exports.gives = nest({
   'post.page.inbox': true,
@@ -68,30 +68,48 @@ exports.create = function (api) {
       newMsgCount.set(0)
       resetFeed({ container, content })
 
+
       pull(
-        next(api.feed.pull.private, {reverse: true, live: false, limit: 100, property: ['timestamp']}),
+        pullPosts({reverse: true}),
         filterDownThrough(),
-        pull.filter(msg => msg.value.content.recps),
         api.feed.pull.rollup(),
         Scroller(container, content, render, false, false)
       )
+
+    }
+    function render (msgRollup) {
+      return api.message.html.render(msgRollup, { layout: 'inbox' })
     }
     draw()
 
-    // TODO - replace this with ssb-query ordered by published timestamp
     pull(
-      next(api.feed.pull.private, {reverse: false, live: true, old: false, limit: 100, property: ['timestamp']}),
+      pullPosts({reverse: false, live: true, old: false}),
       pull.filter(m => !m.sync),
       filterUpThrough(),
       pull.drain(msg => newMsgCount.set(newMsgCount() + 1))
       // TODO - better NEW MESSAGES
     )
 
-    function render (msgRollup) {
-      return api.message.html.render(msgRollup, { layout: 'inbox' })
-    }
-
     container.title = '/inbox'
+    content.title = ''
     return container
+  }
+
+  function pullPosts (opts) {
+    const query = [{
+      $filter: {
+        timestamp: {$gt: 0},
+        value: {
+          content: {
+            type: 'post',
+            recps: {$truthy: true}
+          }
+        }
+      }
+    }]
+
+    const _opts = Object.assign({ query, limit: 100 }, opts)
+
+    return next(api.feed.pull.private, _opts, ['timestamp'])
   }
 }
