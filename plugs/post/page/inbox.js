@@ -18,8 +18,10 @@ exports.needs = nest({
   'feed.pull.rollup': 'first',
   'keys.sync.id': 'first',
   'message.html.compose': 'first',
+  'message.html.render': 'first',
+  'message.sync.isBlocked': 'first',
   'post.html.new': 'first',
-  'message.html.render': 'first'
+  'sbot.pull.stream': 'first'
 })
 
 exports.create = function (api) {
@@ -96,20 +98,25 @@ exports.create = function (api) {
   }
 
   function pullPosts (opts) {
-    const query = [{
-      $filter: {
-        timestamp: {$gt: 0},
-        value: {
-          content: {
-            type: 'post',
-            recps: {$truthy: true}
+    return api.sbot.pull.stream(server => {
+      const query = [{
+        $filter: {
+          timestamp: {$gt: 0},
+          value: {
+            content: {
+              type: 'post',
+              recps: {$truthy: true}
+            }
           }
         }
-      }
-    }]
+      }]
 
-    const _opts = Object.assign({ query, limit: 100 }, opts)
+      const _opts = Object.assign({ query, limit: 100 }, opts)
 
-    return next(api.feed.pull.private, _opts, ['timestamp'])
+      return pull(
+        next(server.private.read, _opts, ['timestamp']),
+        pull.filter(m => !api.message.sync.isBlocked(m))
+      )
+    })
   }
 }
