@@ -21,9 +21,9 @@ exports.create = function (api) {
     // decorate locally
     if (msg.replies && msg.replies.length) {
       element.dataset.root = msg.key
-      element.dataset.id = msg.replies[msg.replies.length - 1].key
+      element.dataset.key = msg.replies[msg.replies.length - 1].key
     } else {
-      element.dataset.id = msg.key
+      element.dataset.key = msg.key
     }
 
     return element
