@@ -21,11 +21,11 @@ const MIN_RECPS = 0
 
 function Recipient ({ recp, avatar }) {
   if (typeof recp === 'string') { // assume it's myId
-    return h('div.recp', [ avatar(recp, 'tiny') ])
+    return h('div.recp', [ avatar(recp, 2.5) ])
   }
 
   return h('div.recp', [
-    avatar(recp.link, 'tiny'),
+    avatar(recp.link, 2.5),
     h('div.name', recp.name)
   ])
 }
