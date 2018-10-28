@@ -1,9 +1,9 @@
 const { h, resolve, computed, Value, Struct, Array: MutantArray } = require('mutant')
 const { isFeed } = require('ssb-ref')
 
-const Recipients = require('./composer-recipients')
-const TextArea = require('./composer-textarea')
-const publish = require('./composer-publish')
+const Recipients = require('./components/recipients')
+const TextArea = require('./components/textarea')
+const publish = require('./components/publish')
 
 function Composer (opts, afterPublish) {
   const {
