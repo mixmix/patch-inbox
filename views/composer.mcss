@@ -17,6 +17,10 @@ Composer {
 
     margin-bottom: 1rem
 
+    input, textarea {
+      padding: .5rem
+    }
+
     textarea {
       min-height: 25rem
     }
@@ -37,6 +41,10 @@ Composer {
       height: 0
       margin: 0
     }
+  }
+
+  section.subject {
+    margin-bottom: 0
   }
 
   section.actions {

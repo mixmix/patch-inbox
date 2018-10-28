@@ -40,16 +40,19 @@ exports.create = function (api) {
 
 function i18n (key) {
   const t = {
-    'composer.textarea.placeholder': 'Write an encrypted message',
-    'composer.label.recipients': '', // 'Recipients',
-    'composer.label.textArea': '',
+    'composer.placeholder.subject': 'Subject (optional)',
+    'composer.placeholder.textarea': 'Your message',
+    'composer.label.recipients': '', // 'To',
+    'composer.label.subject': '',
+    'composer.label.textarea': '',
     'composer.action.addMoreRecps': '+ Add recipients',
-    'composer.action.publish': 'Publish',
+    'composer.action.publish': 'Send encrypted message',
+    'composer.action.publishing': 'Publishing',
     'composer.action.cancel': 'Cancel',
     'composer.alert.one-way': 'Note: you are not currently a recipient, so you will not be able to read this later. This can be useful for sending secrets you cannot hold on to.',
     'error.recps': 'An encrypted message requires at least one recipient'
   }
-  return t[key] || ''
+  return typeof t[key] === 'string' ? t[key] : key
 }
 
 function noop () {}

@@ -15,10 +15,10 @@ function TextArea (opts) {
   suggest.channel = suggest.channel || noop
   suggest.emoji = suggest.emoji || noop
 
-  const textArea = h('textarea.TextArea', {
+  const textArea = h('textarea.ComposerTextarea', {
     value: state.text, // computed(text, t => t),  // CHECK - not sure why this computed was needed
     'ev-input': (ev) => state.text.set(ev.target.value),
-    placeholder: i18n('composer.textarea.placeholder')
+    placeholder: i18n('composer.placeholder.textarea')
   })
 
   suggestify()
@@ -33,7 +33,7 @@ function TextArea (opts) {
       if (char === '@') suggest.about(wordFragment, extraFeedIds, cb)
       if (char === '#') suggest.channel(wordFragment, cb)
       if (char === ':') suggest.emoji(wordFragment, cb)
-    }, {cls: 'PatchSuggest'})
+    }, { cls: 'PatchSuggest' })
   }
 
   return textArea

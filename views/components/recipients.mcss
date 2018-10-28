@@ -8,7 +8,7 @@ $ComposerCard {
   color: #222
 }
 
-Recipients {
+ComposerRecipients {
   $ComposerRecpBackground
   flex-grow: 1
   height: 3.8rem

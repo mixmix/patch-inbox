@@ -70,14 +70,12 @@ exports.create = function (api) {
       newMsgCount.set(0)
       resetFeed({ container, content })
 
-
       pull(
-        pullPosts({reverse: true}),
+        pullPosts({ reverse: true }),
         filterDownThrough(),
         api.feed.pull.rollup(),
         Scroller(container, content, render, false, false)
       )
-
     }
     function render (msgRollup) {
       return api.message.html.render(msgRollup, { layout: 'inbox' })
@@ -85,7 +83,7 @@ exports.create = function (api) {
     draw()
 
     pull(
-      pullPosts({reverse: false, live: true, old: false}),
+      pullPosts({ reverse: false, live: true, old: false }),
       pull.filter(m => !m.sync),
       filterUpThrough(),
       pull.drain(msg => newMsgCount.set(newMsgCount() + 1))
@@ -101,11 +99,11 @@ exports.create = function (api) {
     return api.sbot.pull.stream(server => {
       const query = [{
         $filter: {
-          timestamp: {$gt: 0},
+          timestamp: { $gt: 0 },
           value: {
             content: {
               type: 'post',
-              recps: {$truthy: true}
+              recps: { $truthy: true }
             }
           }
         }

@@ -1,4 +1,4 @@
-const { h, computed, map } = require('mutant')
+const { h, map } = require('mutant')
 const addSuggest = require('suggest-box')
 
 function Recipients (opts) {
@@ -9,7 +9,7 @@ function Recipients (opts) {
     i18n
   } = opts
 
-  return h('Recipients', [
+  return h('ComposerRecipients', [
     map(state.recps, recp => Recipient({ recp, avatar })),
     RecipientInput({ state, suggest, i18n })
   ])
@@ -68,7 +68,7 @@ function RecipientInput ({ state, suggest, i18n }) {
       boxActive = true
       const searchTerm = inputText.replace(/^@/, '')
       suggest.about(searchTerm, cb)
-    }, {cls: 'PatchSuggest'})
+    }, { cls: 'PatchSuggest' })
 
     input.addEventListener('suggestselect', (e) => {
       const { id, title: name } = e.detail

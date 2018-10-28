@@ -1,34 +1,33 @@
 const resolve = require('mutant/resolve')
 const ssbMentions = require('ssb-mentions')
 
-function publish (opts) {
+module.exports = function publish (opts) {
   const {
-    state: {
-      text,
-      recps,
-      isPublishing
-    },
+    state,
+    myKey,
     beforePublish = identityCb,
     afterPublish = noop,
     patchcorePublish
   } = opts
 
-  const content = buildContent({ text, recps })
-  if (!content.text) return
-  if (resolve(isPublishing)) return
+  const { recps, subject, text, isPublishing } = resolve(state)
+  if (isPublishing) return
 
-  isPublishing.set(true)
+  const content = buildContent({ recps, subject, text })
+  if (!content.text) return
+
+  state.isPublishing.set(true)
 
   beforePublish(content, function (err, content) {
     if (err) return handleErr(err)
 
     patchcorePublish(content, (err, msg) => {
-      isPublishing.set(false)
-      if (err) handleErr(err)
+      state.isPublishing.set(false)
+      if (err) return handleErr(err)
       else if (msg) {
-        text.set('')
-        recps.set([])
-        // textArea.value = '' // un-needed?
+        state.recps.set([myKey])
+        state.subject.set('')
+        state.text.set('')
       }
 
       if (afterPublish) afterPublish(err, msg)
@@ -36,22 +35,20 @@ function publish (opts) {
   })
 
   function handleErr (err) {
-    isPublishing.set(false)
+    state.isPublishing.set(false)
     if (afterPublish) afterPublish(err)
     else throw err
   }
 }
 
-module.exports = publish
-
-function buildContent ({ text, recps }) {
+function buildContent ({ recps, subject, text }) {
   return prune({
     type: 'post',
-    text: resolve(text),
-    recps: resolve(recps),
+    recps,
+    subject,
+    text,
     mentions: getMentions(text)
   })
-  // for (var k in content) { content[k] = resolve(content[k]) }
 }
 
 function getMentions (text) {
@@ -78,8 +75,7 @@ function prune (obj) {
   return obj
 }
 
-function noop () {
-}
+function noop () { }
 
 function identityCb (content, cb) {
   cb(null, content)

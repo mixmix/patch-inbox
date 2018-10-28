@@ -81,21 +81,3 @@ function getNewestMsg (msg) {
 
   return msg.replies[msg.replies.length - 1]
 }
-
-function getSpacerClass (recps) {
-  switch (recps.length) {
-    case 1:
-      return '-half'
-    case 3:
-      return '-half'
-    case 4:
-      return '-half'
-    case 5:
-      return '-quarter'
-    case 6:
-      return '-quarter'
-    default:
-      return ''
-  }
-}
-

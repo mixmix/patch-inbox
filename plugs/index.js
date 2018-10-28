@@ -8,7 +8,6 @@ module.exports = {
     'post.html.subject': require('./post/html/subject'),
     'post.page.inbox': require('./post/page/inbox'),
     'router.sync.routes': require('./router/sync/routes'),
-    'styles.mcss': require('./styles/mcss'),
+    'styles.mcss': require('./styles/mcss')
   })
 }
-

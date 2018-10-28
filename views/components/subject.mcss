@@ -1,7 +1,9 @@
-ComposerTextarea {
+ComposerSubject {
+  background: #000
   color: #fff
   letter-spacing: .5px
-  background: #000
+  font-size: 1rem
+  text-decoration: underline
 
   ::placeholder {
     color: rgba(255, 235, 255, .8)

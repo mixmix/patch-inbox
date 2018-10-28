@@ -2,8 +2,9 @@ const { h, resolve, computed, Value, Struct, Array: MutantArray, when } = requir
 const { isFeed } = require('ssb-ref')
 
 const Recipients = require('./components/recipients')
+const Subject = require('./components/subject')
 const TextArea = require('./components/textarea')
-const publish = require('./components/publish')
+const publish = require('./publish')
 
 function Composer (opts, afterPublish) {
   const {
@@ -20,8 +21,9 @@ function Composer (opts, afterPublish) {
   } = opts
 
   const state = Struct({
-    text: Value(resolve(initialText)),
     recps: MutantArray(buildRecps(initialRecps, myKey)),
+    subject: Value(),
+    text: Value(resolve(initialText)),
     isPublishing: Value(false)
   })
   const errors = computed(state, ({ recps }) => {
@@ -42,6 +44,10 @@ function Composer (opts, afterPublish) {
       h('label.recps', i18n('composer.label.recipients')),
       Recipients({ state, suggest, avatar, i18n })
     ]),
+    h('section.subject', [
+      h('label.subject', i18n('composer.label.subject')),
+      Subject({ state, i18n })
+    ]),
     h('section.one-way', { className: oneWayAlertClass }, [
       h('label.recps', ''),
       h('div.alert', i18n('composer.alert.one-way'))
@@ -55,7 +61,7 @@ function Composer (opts, afterPublish) {
     //   })
     // ]),
     h('section.textArea', [
-      h('label.textArea', i18n('composer.label.textArea')),
+      h('label.textArea', i18n('composer.label.textarea')),
       textArea
     ]),
     // TODO preview
@@ -90,7 +96,7 @@ function Composer (opts, afterPublish) {
   ])
 
   function handlePublish () {
-    publish({ state, beforePublish, afterPublish, patchcorePublish })
+    publish({ state, myKey, beforePublish, afterPublish, patchcorePublish })
   }
 
   function handleCancel () {
