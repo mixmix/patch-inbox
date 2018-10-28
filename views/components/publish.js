@@ -6,7 +6,7 @@ function publish (opts) {
     state: {
       text,
       recps,
-      publishing
+      isPublishing
     },
     beforePublish = identityCb,
     afterPublish = noop,
@@ -15,15 +15,15 @@ function publish (opts) {
 
   const content = buildContent({ text, recps })
   if (!content.text) return
-  if (resolve(publishing)) return
+  if (resolve(isPublishing)) return
 
-  publishing.set(true)
+  isPublishing.set(true)
 
   beforePublish(content, function (err, content) {
     if (err) return handleErr(err)
 
     patchcorePublish(content, (err, msg) => {
-      publishing.set(false)
+      isPublishing.set(false)
       if (err) handleErr(err)
       else if (msg) {
         text.set('')
@@ -36,7 +36,7 @@ function publish (opts) {
   })
 
   function handleErr (err) {
-    publishing.set(false)
+    isPublishing.set(false)
     if (afterPublish) afterPublish(err)
     else throw err
   }

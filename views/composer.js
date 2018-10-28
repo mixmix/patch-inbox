@@ -1,4 +1,4 @@
-const { h, resolve, computed, Value, Struct, Array: MutantArray } = require('mutant')
+const { h, resolve, computed, Value, Struct, Array: MutantArray, when } = require('mutant')
 const { isFeed } = require('ssb-ref')
 
 const Recipients = require('./components/recipients')
@@ -22,13 +22,20 @@ function Composer (opts, afterPublish) {
   const state = Struct({
     text: Value(resolve(initialText)),
     recps: MutantArray(buildRecps(initialRecps, myKey)),
-    publishing: Value(false)
+    isPublishing: Value(false)
+  })
+  const errors = computed(state, ({ recps }) => {
+    if (recps.length) return null
+    else return [ i18n('error.recps') ]
   })
 
   const textArea = TextArea({ state, i18n, suggest, extraFeedIds })
   textArea.publish = handlePublish // crude external API
 
-  const oneWayAlertClass = computed(state.recps, recps => recps.some(isMe) ? '-hidden' : '')
+  const oneWayAlertClass = computed(state.recps, recps => {
+    if (!recps.length) return '-hidden' // error will be displayed in this case, hide this error
+    return recps.some(isMe) ? '-hidden' : ''
+  })
 
   return h('Composer', [
     h('section.recps', [
@@ -56,15 +63,27 @@ function Composer (opts, afterPublish) {
     //   preview,
     // ]),
     h('section.actions', [
-      h('label.actions', ''),
+      h('div.errors', computed(errors, errors => {
+        if (!errors) return
+
+        return h('ul', [
+          errors.map(error => h('li', error))
+        ])
+      })),
       h('div.actions', [
-        h('button.-subtle',
+        h('button -subtle',
           { 'ev-click': handleCancel },
           i18n('composer.action.cancel')
         ),
-        h('button -primary',
-          { disabled: state.publishing, 'ev-click': handlePublish },
-          i18n('composer.action.publish')
+        when(state.isPublishing,
+          h('button -primary', [
+            h('i.fa.fa-spinner.fa-pulse'),
+            i18n('composer.action.publishing')
+          ]),
+          h('button -primary',
+            { disabled: errors, 'ev-click': handlePublish },
+            i18n('composer.action.publish')
+          )
         )
       ])
     ])
@@ -77,7 +96,7 @@ function Composer (opts, afterPublish) {
   function handleCancel () {
     state.set(resolve(initialText))
     state.recps.set(buildRecps(initialRecps, myKey))
-    state.publishing.set(false)
+    state.isPublishing.set(false)
     onCancel()
   }
 

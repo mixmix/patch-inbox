@@ -46,7 +46,8 @@ function i18n (key) {
     'composer.action.addMoreRecps': '+ Add recipients',
     'composer.action.publish': 'Publish',
     'composer.action.cancel': 'Cancel',
-    'composer.alert.one-way': 'Note: you are not currently a recipient, so you will not be able to read this later. This can be useful for sending secrets you cannot hold on to.'
+    'composer.alert.one-way': 'Note: you are not currently a recipient, so you will not be able to read this later. This can be useful for sending secrets you cannot hold on to.',
+    'error.recps': 'An encrypted message requires at least one recipient'
   }
   return t[key] || ''
 }

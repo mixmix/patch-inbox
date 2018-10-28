@@ -4,7 +4,7 @@
   "description": "an inbox for the patchcore ecosystem",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "standard --fix"
   },
   "repository": {
     "type": "git",
@@ -32,5 +32,8 @@
     "ssb-mentions": "^0.5.0",
     "ssb-ref": "^2.11.1",
     "suggest-box": "^2.2.3"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
   }
 }

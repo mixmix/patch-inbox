@@ -9,7 +9,7 @@ Composer {
 
   section {
     display: grid
-    grid-template-columns: 0rem auto
+    grid-template-columns: auto 1fr
     grid-template-rows: auto
 
     /* grid-column-gap: 1rem */
@@ -40,9 +40,19 @@ Composer {
   }
 
   section.actions {
+    div.errors {
+      color: fuchsia
+    }
+
     div.actions {
       display: flex
       justify-content: flex-end
+
+      button {
+        i.fa {
+          margin-right: .5rem
+        }
+      }
     }
   }
 }
