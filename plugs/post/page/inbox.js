@@ -64,7 +64,7 @@ exports.create = function (api) {
       ]),
       filterMenu
     ]
-    const { container, content } = api.app.html.scroller({ prepend, className: 'Inbox' })
+    const { container, content } = api.app.html.scroller({ prepend, className: 'Inbox', scrollIntoView: true })
 
     function draw () {
       newMsgCount.set(0)
@@ -112,7 +112,7 @@ exports.create = function (api) {
       const _opts = Object.assign({ query, limit: 100 }, opts)
 
       return pull(
-        next(server.private.read, _opts, ['timestamp']),
+        next(server.query.read, _opts, ['timestamp']),
         pull.filter(m => !api.message.sync.isBlocked(m))
       )
     })

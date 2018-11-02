@@ -22,6 +22,8 @@ Inbox {
 
   section.content {
     margin-top: 1rem
+    margin-bottom: 20vh
+    // trick page into loading more
     div.Message {
       -inbox-card {
       }
