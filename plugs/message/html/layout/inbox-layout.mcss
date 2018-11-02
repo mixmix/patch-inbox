@@ -62,6 +62,10 @@ Message -inbox-card {
         word-break: normal
         margin-right: .5rem
       }
+
+      -unread {
+        font-weight: 600
+      }
     }
 
     div.update {

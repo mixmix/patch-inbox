@@ -1,17 +1,18 @@
 const nest = require('depnest')
-const { h } = require('mutant')
+const { h, Value, onceTrue } = require('mutant')
 
 exports.gives = nest('message.html.layout')
 
 exports.needs = nest({
   'about.html.image': 'first',
+  'app.sync.goTo': 'first', // TODO generalise - this is patchbay only
   'keys.sync.id': 'first',
   'message.html.backlinks': 'first',
   'message.html.author': 'first',
   'message.html.meta': 'map',
   'message.html.timestamp': 'first',
   'post.html.subject': 'first',
-  'app.sync.goTo': 'first' // TODO generalise - this is patchbay only
+  'sbot.obs.connection': 'first'
 })
 
 exports.create = (api) => {
@@ -38,7 +39,7 @@ exports.create = (api) => {
       .filter(Boolean)
       .reduce((sofar, el) => sofar.includes(el) ? sofar : [...sofar, el], []) // .uniq
 
-    const showNewMsg = newMsg && newMsg.value.author !== myId
+    const showNewMsg = newMsg // && newMsg.value.author !== myId
 
     const openMessage = ev => {
       ev.preventDefault()
@@ -56,7 +57,7 @@ exports.create = (api) => {
       ]),
       h('div.spacer'),
       h('section.content', { 'ev-click': openMessage }, [
-        h('header', [
+        h('header', { className: isReadClass(api.sbot.obs.connection, newMsg || rootMsg) }, [
           h('span.count', `(${msgCount})`),
           api.post.html.subject(rootMsg)
         ]),
@@ -80,4 +81,22 @@ function getNewestMsg (msg) {
   if (!msg.replies || msg.replies.length === 0) return
 
   return msg.replies[msg.replies.length - 1]
+}
+
+function isReadClass (connection, msg) {
+  const _class = Value('')
+
+  onceTrue(connection, sbot => {
+    if (!sbot.unread) return
+
+    if (msg.value.author === sbot.id) return
+
+    sbot.unread.isRead(msg.key, (err, isRead) => {
+      if (err) return console.error(err)
+
+      _class.set(isRead ? '-read' : '-unread')
+    })
+  })
+
+  return _class
 }
