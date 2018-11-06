@@ -1,5 +1,7 @@
 const nest = require('depnest')
 const { h, Value, onceTrue } = require('mutant')
+const get = require('lodash.get')
+const { isFeed } = require('ssb-ref')
 
 exports.gives = nest('message.html.layout')
 
@@ -28,15 +30,13 @@ exports.create = (api) => {
     const newMsg = getNewestMsg(msgRollup)
 
     const myId = api.keys.sync.id()
-    const recps = (msgRollup.value.content.recps || [])
+    const recps = get(msgRollup, 'value.content.recps', [])
       .map(recp => {
-        // TODO check these things are feed links!!!
         if (typeof recp === 'string') return recp
-
         if (recp.link) return recp.link
       })
       .filter(key => key !== myId)
-      .filter(Boolean)
+      .filter(isFeed)
       .reduce((sofar, el) => sofar.includes(el) ? sofar : [...sofar, el], []) // .uniq
 
     const showNewMsg = newMsg // && newMsg.value.author !== myId

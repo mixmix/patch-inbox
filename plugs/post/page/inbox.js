@@ -102,9 +102,10 @@ exports.create = function (api) {
           timestamp: { $gt: 0 },
           value: {
             content: {
-              type: 'post',
-              recps: { $truthy: true }
-            }
+              type: 'post'
+              // recps: { $type: object }
+            },
+            private: true
           }
         }
       }]
@@ -113,6 +114,7 @@ exports.create = function (api) {
 
       return pull(
         next(server.query.read, _opts, ['timestamp']),
+        pull.filter(m => Array.isArray(m.value.content.recps)),
         pull.filter(m => !api.message.sync.isBlocked(m))
       )
     })
