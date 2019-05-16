@@ -1,6 +1,7 @@
 const nest = require('depnest')
 const { h, Value, when } = require('mutant')
 const pull = require('pull-stream')
+const Abortable = require('pull-abortable')
 const Scroller = require('pull-scroll')
 const next = require('pull-next-query')
 
@@ -41,6 +42,7 @@ exports.create = function (api) {
     // const id = api.keys.sync.id()
 
     const composerOpen = Value(false)
+    composerOpen(v => console.log('composerOpen', v))
     const composer = api.post.html.new(composerOpen, (err, msg) => {
       if (err) return console.log(err)
       composerOpen.set(false)
@@ -49,13 +51,12 @@ exports.create = function (api) {
 
     const newMsgCount = Value(0)
     const { filterMenu, filterDownThrough, filterUpThrough, resetFeed } = api.app.html.filter(draw) // TODO dep on patchbay
-    const createNewMessage = () => composerOpen.set(true)
 
     const prepend = [ // TODO dep on patchbay
       modal,
       h('div.actions', [
         h('button.new.-primary', {
-          'ev-click': createNewMessage
+          'ev-click': () => composerOpen.set(true)
         }, 'New'),
         h('div.refresh', [
           newMsgCount, ' new messages',
@@ -66,12 +67,16 @@ exports.create = function (api) {
     ]
     const { container, content } = api.app.html.scroller({ prepend, className: 'Inbox', scrollIntoView: true })
 
+    var abortable = Abortable()
     function draw () {
       newMsgCount.set(0)
       resetFeed({ container, content })
+      abortable.abort()
+      abortable = Abortable()
 
       pull(
         pullPosts({ reverse: true }),
+        abortable,
         filterDownThrough(),
         api.feed.pull.rollup(),
         Scroller(container, content, render, false, false)
